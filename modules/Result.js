@@ -50,11 +50,13 @@ class Result {
 
   fail(res) {
     this.code = CODE_ERROR
+    this.msg = 'error'
     this.json(res)
   }
 
   tokenErr(res) {
     this.code = CODE_TOKEN_ERROR
+    this.msg = 'token失效'
     this.json(res)
   }
 }

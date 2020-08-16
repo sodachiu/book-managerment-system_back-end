@@ -6,7 +6,7 @@ const { body, validationResult } = require('express-validator')
 
 const Result = require('../../modules/Result')
 const { login, findUser } = require('../../service/user')
-const { createToken, decode } = require('../jwt')
+const { createToken } = require('../jwt')
 const router = express.Router()
 
 router.post(
@@ -44,14 +44,10 @@ router.post(
 
 router.get('/info', (req, res, next) => {
   console.log('into /user/info')
-  const { authorization } = req.headers
-  if (!authorization) {
-    new Result().tokenErr(res)
-  }
 
-  const { username } = decode(authorization)
+  const { username } = req.user
   if (!username) {
-    new Result('用户名不存在').fail(res)
+    new Result().tokenErr(res)
   }
 
   findUser(username).then(user => {

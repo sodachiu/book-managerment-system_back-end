@@ -1,16 +1,28 @@
 'use strict';
 const jwt = require('jsonwebtoken')
+const expressJwt = require('express-jwt')
 
 const {
   PRIVATE_KEY,
   TOKEN_EXPIRED
 } = require('../utils/constant')
 
+const jwtAuth = expressJwt({
+    secret: PRIVATE_KEY,
+    credentialsRequired: true,
+    algorithms: ['HS256']
+  }).unless({
+    path: [
+      '/',
+      '/user/login'
+    ]
+})
+
 function createToken(payload) {
   if ('[object Object]' !== Object.prototype.toString.apply(payload)) {
     payload = { payload }
   }
-  return jwt.sign(payload, PRIVATE_KEY, { expiresIn: TOKEN_EXPIRED })
+  return `Bearer ${jwt.sign(payload, PRIVATE_KEY, { expiresIn: TOKEN_EXPIRED })}`
 }
 
 function decode(authorization) {
@@ -30,6 +42,7 @@ function decode(authorization) {
 
 module.exports = {
   createToken,
-  decode
+  decode,
+  jwtAuth
 }
 

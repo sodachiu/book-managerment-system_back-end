@@ -4,9 +4,10 @@ const boom = require('boom')
 
 const userRouter = require('../router/user')
 const Result = require('../modules/Result')
+const { jwtAuth } = require('./jwt')
 
 const router = express.Router()
-
+router.use(jwtAuth)
 router.use('/user', userRouter)
 
 router.use((req, res, next) => {
@@ -15,7 +16,12 @@ router.use((req, res, next) => {
 
 router.use((err, req, res, next) => {
   console.log('err: ', err)
-  new Result(err).fail(res)
+  if (err.name === 'UnauthorizedError') {
+    new Result(err).tokenErr(res)
+  } else {
+    // complete boom status
+    new Result(err).fail(res)
+  }
 })
 
 module.exports = router
